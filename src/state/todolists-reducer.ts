@@ -6,6 +6,7 @@ import {RequestStatusType, setAppStatusAC} from "./app-reducer";
 import {Simulate} from "react-dom/test-utils";
 import error = Simulate.error;
 import {handleServerNetworkError} from "../utils/error-utils";
+import {fetchTasksTC} from "./tasks-reducer";
 
 const initialState: Array<TodolistDomainType> = [
     /*{id: todolistId1, title: 'What to learn', filter: 'all', addedDate: '', order: 0},
@@ -40,6 +41,8 @@ export const todolistsReducer =
             case 'CHANGE-TODOLIST-ENTITY-STATUS': {
                 return state.map(item => item.id === action.id ? {...item, entityStatus: action.status} : item)
             }
+            case 'CLEAR-DATA':
+                return []
             default:
                 return state;
         }
@@ -63,7 +66,9 @@ export const setTodolistsAC = (todoLists: Array<TodolistType>) => {
 };
 export const changeTodolistEntityStatusAC = (id: string, status: RequestStatusType) =>
     ({type: 'CHANGE-TODOLIST-ENTITY-STATUS', id, status}) as const
-
+export const clearTodosDataAC = () => {
+    return {type: 'CLEAR-DATA'} as const
+}
 // thunks
 export const fetchTodoListsThunk = () => {
     return (dispatch: AppThunkDispatch) => {
@@ -72,6 +77,10 @@ export const fetchTodoListsThunk = () => {
             .then(({data}) => {
                 dispatch(setTodolistsAC(data))
                 dispatch(setAppStatusAC("succeeded"))
+                return data
+            })
+            .then((data) => {
+                data.forEach(tl => dispatch(fetchTasksTC(tl.id)))
             })
             .catch(error => {
                 handleServerNetworkError(error, dispatch)
@@ -111,6 +120,7 @@ export const updateTodolistTitleTC = (id: string, title: string) => {
 export type RemoveTodolistActionType = ReturnType<typeof removeTodolistAC>;
 export type AddTodolistActionType = ReturnType<typeof addTodolistAC>;
 export type SetTodoListsActionType = ReturnType<typeof setTodolistsAC>;
+export type ClearTodosDataActionType = ReturnType<typeof clearTodosDataAC>
 
 
 type ActionsType =
@@ -120,6 +130,7 @@ type ActionsType =
     | ReturnType<typeof changeTodolistFilterAC>
     | ReturnType<typeof setTodolistsAC>
     | ReturnType<typeof changeTodolistEntityStatusAC>
+    | ReturnType<typeof clearTodosDataAC>
 
 
 export type FilterValuesType = "all" | "active" | "completed";

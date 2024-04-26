@@ -1,5 +1,5 @@
 import {
-    AddTodolistActionType,
+    AddTodolistActionType, ClearTodosDataActionType,
     RemoveTodolistActionType, SetTodoListsActionType,
 } from "./todolists-reducer";
 import {TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelType} from "../api/todolists-api";
@@ -57,6 +57,8 @@ export const tasksReducer = (
             })
             return copy
         }
+        case "CLEAR-DATA":
+            return {}
         default:
             return state;
     }
@@ -168,6 +170,7 @@ type ActionsType =
     | SetTodoListsActionType
     | ReturnType<typeof setTasksAC>
     | SetIsInitializeActionType
+    | ClearTodosDataActionType
 
 export type UpdateDomainTaskModelType = {
     title?: string

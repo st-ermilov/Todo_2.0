@@ -47,7 +47,7 @@ export const Login = () => {
             return errors
         },
         onSubmit: values => {
-            alert(JSON.stringify(values))
+            // alert(JSON.stringify(values))
             dispatch(loginTC(values))
             formik.resetForm()
         },
